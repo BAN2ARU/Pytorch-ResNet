@@ -4,12 +4,11 @@ Author email : naris27@dgu.ac.kr
 Github : https://github.com/ban2aru
 License : MIT license
 Modified Year-Month : 2022-04
-Version : 1.0
 
 Description : train.py
 The main code for training ResNet using Pytorch
 '''
-from .utils import get_train_dataloader, get_valid_dataloader
+from .utils import get_train_dataloader, get_valid_dataloader, make_logger
 import time
 import torch
 import os
@@ -23,17 +22,20 @@ def train(args, start_epoch, criterion, optimizer, train_scheduler, best_loss, w
     valid_loader = get_valid_dataloader(args)
     start = time.time()
     save_point = './checkpoint/'+ start_strf
-    train_txt = args.txt_dir + '/' + start_strf
     if args.gpu :
         model = model.cuda()
 
     best_model = model
+    
     if not os.path.isdir(args.txt_dir) :
         os.mkdir(args.txt_dir)
+
+    train_txt = args.txt_dir + '/' + start_strf
     if not os.path.isdir(train_txt):
         os.mkdir(train_txt)
-    
-    sys.stdout = open(train_txt+'/train.txt', 'w')
+    train_txt = train_txt + '/train.log'
+
+    logger = make_logger('train', train_txt)
 
     for epoch in range(start_epoch+1 , start_epoch + args.epochs+1) :
 
@@ -68,8 +70,8 @@ def train(args, start_epoch, criterion, optimizer, train_scheduler, best_loss, w
             #Tensorboard
             writer.add_scalar('Train/Train_loss_iteration', loss.item(), n_iter)
         
-        print('||'+time.strftime('%Y-%m-%d-%H:%M:%S')+'||Training Step')
-        print('||'+time.strftime('%Y-%m-%d-%H:%M:%S')+'||Epoch[{epoch}/{epochs}] Train_Loss : {:0.4f} Train_Accuracy : {:0.4f} LearningRate : {:0.7f}'.format(
+        logger.info('Training Step')
+        logger.info('Epoch[{epoch}/{epochs}] Train_Loss : {:0.4f} Train_Accuracy : {:0.4f} LearningRate : {:0.7f}'.format(
             running_train_loss/ len(training_loader.dataset),
             running_correct.float() / len(training_loader.dataset) * 100,
             optimizer.param_groups[0]['lr'],
@@ -102,8 +104,8 @@ def train(args, start_epoch, criterion, optimizer, train_scheduler, best_loss, w
                 _, predicted = torch.max(outputs.data, 1)
                 valid_correct += predicted.eq(labels).cpu().sum()
 
-            print('||'+time.strftime('%Y-%m-%d-%H:%M:%S')+'||Validation Step')
-            print('||'+time.strftime('%Y-%m-%d-%H:%M:%S')+'||Epoch[{epoch}/{epochs}] Validation_Loss : {:0.4f} Validation_Accuracy : {:0.4f}'.format(
+            logger.info('Validation Step')
+            logger.info('Epoch[{epoch}/{epochs}] Validation_Loss : {:0.4f} Validation_Accuracy : {:0.4f}'.format(
                 valid_loss / len(valid_loader.dataset),
                 valid_correct.float() / len(valid_loader.dataset) * 100,
                 epoch = epoch,
@@ -116,7 +118,7 @@ def train(args, start_epoch, criterion, optimizer, train_scheduler, best_loss, w
             epoch_valid_loss = valid_loss / len(valid_loader.dataset)
 
             if epoch_valid_loss < best_loss :
-                print('||'+time.strftime('%Y-%m-%d-%H:%M:%S')+'||Saving Model Epoch %s' %(epoch))
+                logger.info('||Saving Model Epoch %s' %(epoch))
                 best_loss = epoch_valid_loss
                 best_model = copy.deepcopy(model)
                 state = {
@@ -144,19 +146,23 @@ def train(args, start_epoch, criterion, optimizer, train_scheduler, best_loss, w
                     'valid_loss' : loss_temp,
                     'epoch' : epoch
             }
-            print('||'+time.strftime('%Y-%m-%d-%H:%M:%S')+'||Saving Last Model Epoch%d' %(epoch))
+            logger.info('Saving Last Model Epoch%d' %(epoch))
             torch.save(state, save_point+'/%s-%s.pth' %(args.net,epoch))
             
     train_time = time.time() - start
-    print('||'+time.strftime('%Y-%m-%d-%H:%M:%S')+'||Training Completed : {:.2f}sec'.format(train_time))
-
-    sys.stdout.close()
+    logger.info('Training Completed : {:.2f}sec'.format(train_time))
 
 
-
-def train_resume(args, model) :
-    print('||'+time.strftime('%Y-%m-%d-%H:%M:%S')+'||Resume training from checkpoint')
+def train_resume(args, model, start_strf) :
     assert os.path.isfile(args.chk_dir), 'Error : chekpoint directory does not exist' 
+
+    train_txt = args.txt_dir + '/' + start_strf
+    if not os.path.isdir(train_txt):
+        os.mkdir(train_txt)
+    train_txt = train_txt + '/train.log'
+    logger = make_logger('resume', train_txt)
+
+    logger.info('||Resume training from checkpoint')
 
     checkpoint = torch.load(args.chk_dir)
     model.load_state_dict(checkpoint['model'])

@@ -4,7 +4,6 @@ Author email : naris27@dgu.ac.kr
 Github : https://github.com/ban2aru
 License : MIT license
 Modified Year-Month : 2022-04
-Version : 1.0
 
 Description : utils.py
 The main code for utils using Pytorch
@@ -22,6 +21,8 @@ import os
 import torch
 from torch.optim.lr_scheduler import _LRScheduler
 import math
+import logging
+import logging.handlers
 
 def get_network(args):
     if (args.net == 'ResNet18'):
@@ -213,3 +214,20 @@ class CosineAnnealingWarmUpSchedule(_LRScheduler) :
         for param_group, lr in zip(self.optimizer.param_groups, self.get_lr()):
             param_group['lr'] = lr
         
+def make_logger(logger_name, log_file) :
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(logging.INFO)
+
+    formatter = logging.Formatter('%(asctime)s||%(message)s')
+
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.INFO)
+    stream_handler.setFormatter(formatter)
+
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setFormatter(formatter)
+
+    logger.addHandler(stream_handler)
+    logger.addHandler(file_handler)
+
+    return logger

@@ -4,7 +4,6 @@ Author email : naris27@dgu.ac.kr
 Github : https://github.com/ban2aru
 License : MIT license
 Modified Year-Month : 2022-04
-Version : 1.0
 
 Description : test.py
 The main code for testing ResNet using Pytorch

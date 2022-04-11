@@ -4,7 +4,7 @@ Author email : naris27@dgu.ac.kr
 Github : https://github.com/ban2aru
 License : MIT license
 Modified Year-Month : 2022-04
-Version : 1.0
+Version : 1.0.1
 
 Description : main.py
 The main code for training/testing ResNet using Pytorch
@@ -31,12 +31,12 @@ parser.add_argument('--gpu', default=False, type=bool, help='whether or not use 
 parser.add_argument('--shuffle', default=True, type=bool, help='wheter or not shuffle when training')
 parser.add_argument('--num_workers', default=2, type=int, help='number of workers(for data load multi-processing)')
 
-# parser.add_argument('--net', default='ResNet18', required=True, help='type of network')
-parser.add_argument('--net', default='ResNet18', help='type of network')
+parser.add_argument('--net', default='ResNet18', help=' | ResNet18 | ResNet34 | ResNet50 | ResNet101 | ResNet152 |')
 parser.add_argument('--phase', default='Train', type=str, choices=['Train', 'Test'], help='choose train phase or test phase')
+parser.add_argument('--num_classes', default=10, type=int, help='number of class')
+
 parser.add_argument('--log_dir', default = './log', type=str, help='tensorboard log directory')
 parser.add_argument('--txt_dir', default= './txt', type=str, help='train log txtfile directory')
-parser.add_argument('--num_classes', default=10, type=int, help='number of class')
 parser.add_argument('--dataset_path', default='./data', type=str, help='trianing/test directory(parent folder)')
 parser.add_argument('--batch_size', default=16, type=int, help='number of batch_size')
 parser.add_argument('--height', default=28, type=int, help='image height')
