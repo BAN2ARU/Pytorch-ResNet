@@ -135,7 +135,16 @@ def train(args, start_epoch, criterion, optimizer, train_scheduler, best_loss, w
                 torch.save(state, save_point+'/%s-%sepoch.pth' %(args.net,epoch))
 
         if epoch == args.epochs :
-            print('||'+time.strftime('%Y-%m-%d-%H:%M:%S')+'||Saving Model Epoch%d' %(epoch))
+            loss_temp = epoch_valid_loss
+            end_model = copy.deepcopy(model)
+            state = {
+                    'model' : end_model.state_dict(),
+                    'optimizer' : optimizer.state_dict(),
+                    'train_loss' : running_train_loss/ len(training_loader.dataset),
+                    'valid_loss' : loss_temp,
+                    'epoch' : epoch
+            }
+            print('||'+time.strftime('%Y-%m-%d-%H:%M:%S')+'||Saving Last Model Epoch%d' %(epoch))
             torch.save(state, save_point+'/%s-%s.pth' %(args.net,epoch))
             
     train_time = time.time() - start
