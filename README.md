@@ -49,7 +49,7 @@ python main.py --resume=True --net='ResNet18' --phase='Train' --num_classes=10 -
 # fine-tuning (ImageNet)
 python main.py --pretrained_model=True --net='ResNet18' --phase='Train' --num_classes=10 --lr=0.1 --epochs=100
 ```
-Train loss, accuracy per epoch and Validation loss, accuracy per epoch will save "txt_dir".
+Train loss, accuracy per epoch and Validation loss, accuracy per epoch will save "txt_dir". <br/>
 Default directory is "./txt/####(timestamp)".
 
 ### (Optional) Tensorboard
