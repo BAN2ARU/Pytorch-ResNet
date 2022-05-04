@@ -14,11 +14,9 @@ Reference :
     https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html
 '''
 
-from torch import load
-from torch import batch_norm, nn
+from torch import nn
 import torch.utils.model_zoo as model_zoo
 import torch.nn.functional as F
-import torchvision.models as models
 
 __all__ = ['ResNet', 'ResNet18', 'ResNet34', 'ResNet50', 'ResNet101', 'ResNet152']
 
