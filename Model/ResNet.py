@@ -14,6 +14,7 @@ Reference :
     https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html
 '''
 
+import torch
 from torch import nn
 import torch.utils.model_zoo as model_zoo
 import torch.nn.functional as F
@@ -123,8 +124,8 @@ class ResNet(nn.Module):
         out = self.layer2(out)
         out = self.layer3(out)
         out = self.layer4(out)
-        out = F.avg_pool2d(out, 1)
-        out = out.view(out.size(0), -1)
+        out = F.adaptive_avg_pool2d(out, 1)
+        out = torch.flatten(out, 1)
         out = self.fc(out)
         return out
 
